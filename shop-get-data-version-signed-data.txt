@@ -1,0 +1,41 @@
+title This is a title
+
+
+participant AppLogic
+participant SolidLib
+
+participant IDP
+
+participant DataInterface
+participant AuthZInterface
+participant LogInterface
+
+AppLogic->SolidLib: Login (IDP?)
+SolidLib->IDP: LoginRedirect(IDP)
+IDP->SolidLib: Redirect(TokenAuthN)
+SolidLib->AppLogic: LoggedIn(Session)
+note over SolidLib: Lib knows WebID, client, issuer, well knowns, endpoints
+
+
+note over AppLogic: If we match the context of a Policy,\nwe automatically agree and sign\nWe match on the Intersection of the context\nThis needs to be in AuthZ Logic - TBC
+
+AppLogic->SolidLib: session.GetData(query, context: purpose[])
+note over DataInterface:GET\+\+ = GET Data, prov, signed
+SolidLib->DataInterface:call(TokenAuthN, Query, Action: GET\+\+, context: purpose[] )
+DataInterface->SolidLib: NoTokenAuthZ(redirect: EndpointAuthZ, action: GET\+\+)
+SolidLib->AuthZInterface: call(subj: TokenAuthN, action: GET\+\+, resource: query, context: purpose)
+note over AuthZInterface: 1. Policy Matching and Retrieval\n2. Execute matching Policies\n3. Instantiate relevant Policies\n4.Decide for access OR extra obligations\n(This is where we can do negotiations)
+note over AuthZInterface: Obligation for signature is detected
+AuthZInterface->SolidLib: return (Instantiated Polic(y/ies) )
+
+note over SolidLib:Go through list of policies and Sign
+
+SolidLib->AuthZInterface:call(signed Instantiated Policies)
+note over AuthZInterface: 1. verify signatures\n
+AuthZInterface->SolidLib: return AuthZ Token (containing store signed instantiated policies)
+
+SolidLib->DataInterface:call(TokenAuthZ, Query, Action: GET\+\+ )
+note over DataInterface:1. Retrieve Data \n2.Merge with instantiated policy\n3. Sign Data\+ -> Data\+\+\n4. Log Data\+\+
+DataInterface->SolidLib: return Data\+\+
+
+SolidLib->AppLogic: return {Data\+\+}

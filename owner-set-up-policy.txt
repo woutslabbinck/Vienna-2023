@@ -1,0 +1,31 @@
+title Owner set up policy (management app)
+
+
+participant AppLogic
+participant SolidLib
+
+participant IDP
+
+participant AdminInterface
+participant AuthZInterface
+
+AppLogic->SolidLib: Login (IDP?)
+SolidLib->IDP: LoginRedirect(IDP)
+IDP->SolidLib: Redirect(TokenAuthN)
+SolidLib->AppLogic: LoggedIn(Session)
+note over SolidLib: Lib knows WebID, client, issuer, well knowns, endpoints
+
+note over AppLogic: There exists a policy\nThe owner wants to store it
+
+AppLogic->SolidLib: AddPolicy(policy)
+SolidLib->AdminInterface: AddPolicy(?Authn Token?, policy)
+AdminInterface->SolidLib: No Authz Token
+
+SolidLib->AuthZInterface: requestAuthz(subject: AuthNToken, action: addPolicy, res: Pol)
+AuthZInterface->SolidLib: return authZ Token
+note over AuthZInterface: Internal vs External\nExternal allows for checking extra claims, negotiation, ...
+
+SolidLib->AdminInterface: AddPolicy(AuthZ Token, policy)
+note over AdminInterface:Mock adding policy\n* add Policy in storage\n* Integrity constraints\n* Conflict Resolution
+AdminInterface->SolidLib: return OK
+SolidLib->AppLogic: return OK
