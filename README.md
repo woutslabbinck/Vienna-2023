@@ -12,10 +12,17 @@ Can be online visualised via [sequencediagram.org](https://sequencediagram.org/)
 
 ![](img/shop-get-data-version-not-signing-data.svg)
 
-How to run
+How to run:
 
 ```sh
 npm i
+```
+Create a .env resource with WebID, username and password with a CSS (supporting client credentials):
+
+```env
+WEB_ID=""
+USER_NAME=""
+PASSWORD=""
 ```
 
 Start the AuthZ server
@@ -27,5 +34,5 @@ npx ts-node src/AuthZ/AuthZServer.ts
 SolidLib shop gets data flow
 
 ```sh
-npx ts-node test.ts
+npx ts-node authzflow.ts 
 ```
