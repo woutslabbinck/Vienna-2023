@@ -41,7 +41,9 @@ class SolidLib {
                 Issuer: "" // TODO:
             },
             action: Action.Read,
-            query: query
+            query: query,
+            purpose: purpose,
+            agreement: undefined
         }
 
         const authZToken = await this.getAuthZToken(authZRequestMessage)
@@ -68,7 +70,7 @@ class SolidLib {
                 "access-mode": "read",
                 "resource": authZRequestMessage.query,
                 "purpose": authZRequestMessage.purpose,
-                "agreement": authZRequestMessage.agreement
+                "agreement": authZRequestMessage.agreement ?? null
             })
         })
 

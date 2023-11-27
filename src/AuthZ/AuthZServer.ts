@@ -19,7 +19,7 @@ app.post('/', async (req, res) => {
   const authNToken = authNHeader.split(" ")[1]
   const clientSession = parseJwt(authNToken)
 
-  console.log("[Authz]: AuthN token: OK");
+  console.log(`[${new Date().toISOString()}] - Authz: AuthN token: OK`);
 
   const client_id = clientSession.client_id.split("_")[0] // don't want random uuid
   const actor = clientSession.webid
@@ -35,7 +35,7 @@ app.post('/', async (req, res) => {
   const authZRequestMessage = req.body
 
   if (authZRequestMessage.agreement === null) {
-    console.log(`[Authz]: "${client_id}" Requesting ${authZRequestMessage['access-mode']} for ${authZRequestMessage.resource} with purpose`,authZRequestMessage.purpose)
+    console.log(`[${new Date().toISOString()}] - Authz: "${client_id}" Requesting ${authZRequestMessage['access-mode']} for ${authZRequestMessage.resource} with purpose`,authZRequestMessage.purpose)
 
     // Policy matching here | stubbed
     const authZResponseMessage = {
@@ -55,7 +55,7 @@ app.post('/', async (req, res) => {
       }
     }
 
-    console.log(`[Authz]: "${client_id}" needs to sign this "pod signed Instantiated Policy".`)
+    console.log(`[${new Date().toISOString()}] - Authz: "${client_id}" needs to sign this "pod signed Instantiated Policy".`)
 
     res
       .status(401)
@@ -65,12 +65,12 @@ app.post('/', async (req, res) => {
   }
 
   // verify agreement
-  console.log(`[Authz]: "${client_id}" Requesting ${authZRequestMessage['access-mode']} for ${authZRequestMessage.resource} with agreement.`)
-  console.log(`[Authz]: Verifying agreement.`)
-  console.log(`[Authz]: Agreement verified: Storing it to [Log Store].`)
+  console.log(`[${new Date().toISOString()}] - Authz: "${client_id}" Requesting ${authZRequestMessage['access-mode']} for ${authZRequestMessage.resource} with agreement.`)
+  console.log(`[${new Date().toISOString()}] - Authz: Verifying agreement.`)
+  console.log(`[${new Date().toISOString()}] - Authz: Agreement verified: Storing it to [Log Store].`)
 
 
-  console.log(`[Authz]: Returning AuthZ token.`)
+  console.log(`[${new Date().toISOString()}] - Authz: Returning AuthZ token.`)
   // sent authZtoken
  
   res
