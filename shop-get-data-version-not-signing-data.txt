@@ -1,3 +1,4 @@
+@startuml
 title Requesting data (not signing data)
 
 
@@ -47,3 +48,4 @@ DataInterface->SolidLib: return Data\+
 note over SolidLib: We merge the Data\+ with the agreements so we have Data\+\+
 SolidLib->AppLogic: return Data\+\+
 
+@enduml

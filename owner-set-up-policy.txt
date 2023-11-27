@@ -1,3 +1,4 @@
+@startuml
 title Owner set up policy (management app)
 
 
@@ -29,3 +30,4 @@ SolidLib->AdminInterface: AddPolicy(AuthZ Token, policy)
 note over AdminInterface:Mock adding policy\n* add Policy in storage\n* Integrity constraints\n* Conflict Resolution
 AdminInterface->SolidLib: return OK
 SolidLib->AppLogic: return OK
+@enduml
