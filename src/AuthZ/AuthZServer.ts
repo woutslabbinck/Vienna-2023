@@ -34,8 +34,9 @@ app.post('/', async (req, res) => { // TODO: replace to post
   }
   const authZRequestMessage = req.body
 
-  console.log(`[Authz]: "${client_id}" Requesting ${authZRequestMessage['access-mode']} for ${authZRequestMessage.resource} with purpose`,authZRequestMessage.purpose)
   if (authZRequestMessage.agreement === null) {
+    console.log(`[Authz]: "${client_id}" Requesting ${authZRequestMessage['access-mode']} for ${authZRequestMessage.resource} with purpose`,authZRequestMessage.purpose)
+
     // Policy matching here | stubbed
     const authZResponseMessage = {
       type: "signobligation",
@@ -64,11 +65,21 @@ app.post('/', async (req, res) => { // TODO: replace to post
   }
 
   // verify agreement
+  console.log(`[Authz]: "${client_id}" Requesting ${authZRequestMessage['access-mode']} for ${authZRequestMessage.resource} with agreement.`)
+  console.log(`[Authz]: Verifying agreement.`)
+  console.log(`[Authz]: Agreement verified: Storing it to [Log Store].`)
 
 
+  console.log(`[Authz]: Returning AuthZ token.`)
   // sent authZtoken
-
-  res.send('Hello World!')
+ 
+  res
+    .status(200)
+    .contentType("application/json")
+    .send({
+      access_token: "verySecretToken.Allowed-to-read-dob.",
+      type: 'Bearer' // maybe Dpop, I don't fucking know
+    })
 })
 
 app.listen(port, () => {
