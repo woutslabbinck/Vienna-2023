@@ -1,12 +1,6 @@
 import { Session } from "@rubensworks/solid-client-authn-isomorphic";
 import { Action, AuthZToken, DataPlusPlus, SolidAuthZRequestMessage } from "./src/ISolidLib";
 import { getAuthenticatedSession } from "./src/util/CSSAuthentication";
-require('dotenv').config()
-
-const authZServerURL = "http://localhost:8050/"
-const webId: string = process.env.WEB_ID!
-const username: string = process.env.USER_NAME!
-const password: string = process.env.PASSWORD!
 
 class SolidLib {
     private session: Session | undefined;
@@ -16,8 +10,10 @@ class SolidLib {
     }
 
     public async login(IDP?: string): Promise<void> {
-        console.log("[SolidLib]:login - Logging in.")
+        require('dotenv').config()
 
+        console.log("[SolidLib]:login - Logging in.")
+        // note: hardcoded
         const webId: string = process.env.WEB_ID!
         const username: string = process.env.USER_NAME!
         const password: string = process.env.PASSWORD!
@@ -56,6 +52,7 @@ class SolidLib {
     }
 
     private async getAuthZToken(authZRequestMessage: SolidAuthZRequestMessage): Promise<AuthZToken> {
+        const authZServerURL = "http://localhost:8050/" // Note: hardcoded
 
         if (!this.session) {
             throw Error("No session")
