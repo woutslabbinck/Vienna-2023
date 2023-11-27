@@ -11,3 +11,21 @@ Can be online visualised via [sequencediagram.org](https://sequencediagram.org/)
 ### Shop gets data (data not signed)
 
 ![](img/shop-get-data-version-not-signing-data.svg)
+
+How to run
+
+```sh
+npm i
+```
+
+Start the AuthZ server
+
+```sh
+npx ts-node src/AuthZ/AuthZServer.ts
+```
+
+SolidLib shop gets data flow
+
+```sh
+npx ts-node test.ts
+```
