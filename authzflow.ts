@@ -1,5 +1,5 @@
 import { Session } from "@rubensworks/solid-client-authn-isomorphic";
-import { Action, AuthZInterfaceResponse, AuthZToken, DataPlusPlus, ErrorMessage, ISolidAwareLib, PreObligationRequest, SolidAuthZRequestMessage, SolidDataRequestMessage } from "./src/ISolidLib";
+import { Action, AuthZToken, DataPlusPlus, SolidAuthZRequestMessage } from "./src/ISolidLib";
 import { getAuthenticatedSession } from "./src/util/CSSAuthentication";
 require('dotenv').config()
 
@@ -69,12 +69,9 @@ class SolidLib {
             },
             body: JSON.stringify({
                 "access-mode": "read",
-                "resource": "date_of_birth",
-                "purpose": [
-                    "verification",
-                    "advertisement"
-                ],
-                "agreement": null
+                "resource": authZRequestMessage.query,
+                "purpose": authZRequestMessage.purpose,
+                "agreement": authZRequestMessage.agreement
             })
         })
 
@@ -85,6 +82,7 @@ class SolidLib {
             console.log(`[SolidLib]:getAuthZToken - No Authorization token received; Received status code ${res.status} with following error message: ${preObligationRequest.type}.`)
             console.log(`[SolidLib]:getAuthZToken - Signing "pod signed Instantiated Policy".`)
 
+            // Note: maybe this can be recursive?
             const agreement = {
                 owner: preObligationRequest.value.actor,
                 ownerSignature: preObligationRequest.value.actorSignature,

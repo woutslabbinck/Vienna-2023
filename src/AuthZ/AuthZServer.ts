@@ -4,7 +4,7 @@ const port = 8050
 
 app.use(express.json())
 
-app.post('/', async (req, res) => { // TODO: replace to post
+app.post('/', async (req, res) => {
   // validate AuthN token
   // note: stubbed
   if (!req.headers.authorization) {
@@ -39,7 +39,7 @@ app.post('/', async (req, res) => { // TODO: replace to post
 
     // Policy matching here | stubbed
     const authZResponseMessage = {
-      type: "signobligation",
+      type: "signObligation",
       value: {
         actor: actor,
         actorSignature: {
