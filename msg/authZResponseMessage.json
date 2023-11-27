@@ -1,0 +1,16 @@
+{
+    "type": "signobligation",
+    "value": {
+        "actor": "Bob",
+        "actorSignature": {
+            "issuer": "Pod",
+            "value": "hash"
+        },
+        "policy": {
+            "access-mode": "read",
+            "resource": "date_of_birth",
+            "purpose": "verification",
+            "actor": "$authN.client_id"
+        }
+    }
+}
