@@ -1,0 +1,9 @@
+{
+    "access-mode": "read",
+    "resource": "date_of_birth",
+    "purpose": [
+        "verification",
+        "advertisement"
+    ],
+    "agreement": null
+}
