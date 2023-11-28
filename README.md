@@ -12,6 +12,7 @@ Can be online visualised via [sequencediagram.org](https://sequencediagram.org/)
 
 ![](img/shop-get-data-version-not-signing-data.svg)
 
+## Code
 How to run:
 
 ```sh
@@ -25,10 +26,20 @@ USER_NAME=""
 PASSWORD=""
 ```
 
-Start the AuthZ server
+Start the AuthZ Interface (server)
 
 ```sh
 npx ts-node src/AuthZ/AuthZServer.ts
+```
+
+Start the Admin Interface (server)
+```sh
+npx ts-node src/Admin/AdminServer.ts 
+```
+
+SolidLib shop adds policy flow
+```sh
+npx ts-node adminFlow.ts
 ```
 
 SolidLib shop gets data flow
@@ -36,3 +47,4 @@ SolidLib shop gets data flow
 ```sh
 npx ts-node app.ts 
 ```
+

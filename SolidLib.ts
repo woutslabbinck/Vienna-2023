@@ -55,7 +55,24 @@ export class SolidLib {
     }
 
     public async addPolicy(policy: string): Promise<boolean> {
-        // stubbed: Don't have access
+        const adminInterfaceUrl = "http://localhost:8060/"
+
+        if (!this.session) {
+            throw Error("No session")
+        }
+
+        let response = await this.session.fetch(adminInterfaceUrl, {
+            method: "POST",
+            headers: {
+                "content-type": "text/turtle"
+            },
+            body: policy
+        })
+
+        if (response.status === 200) {
+            return true
+        }
+
         console.log(`SolidLib]:addPolicy - No access, need AuthZ token.`)
         const authZRequestMessage: SolidAuthZRequestMessage = {
             authNToken: {
@@ -67,20 +84,32 @@ export class SolidLib {
             query: "policy"
         }
         const authZToken = await this.getAuthZToken(authZRequestMessage)
-
         console.log(`SolidLib]:addPolicy - Now that token is there, add Policy`, authZToken)
-        throw Error("not implemented yet")
+
+        response = await fetch(adminInterfaceUrl, {
+            method: "POST",
+            headers: {
+                authorization: `${authZToken.type} ${authZToken.access_token}`,
+                "content-type": "text/turtle"
+            },
+            body: policy
+        })
+        if (response.status === 200) {
+            return true
+        }
+        throw Error("Some unknown error made it that the policy was not added")
 
     }
+
     private async getAuthZToken(authZRequestMessage: SolidAuthZRequestMessage): Promise<AuthZToken> {
-        const authZServerURL = "http://localhost:8050/" // Note: hardcoded
+        const AuthZInterfaceURL = "http://localhost:8050/" // Note: hardcoded
 
         if (!this.session) {
             throw Error("No session")
         }
 
-        console.log(`[SolidLib]:getAuthZToken - Requesting Authorization token at ${authZServerURL}.`)
-        const res = await this.session.fetch(authZServerURL, {
+        console.log(`[SolidLib]:getAuthZToken - Requesting Authorization token at ${AuthZInterfaceURL}.`)
+        const res = await this.session.fetch(AuthZInterfaceURL, {
             method: "POST",
             headers: {
                 "content-type": "application/json"
@@ -116,7 +145,7 @@ export class SolidLib {
                 policy: preObligationRequest.value.policy
             }
 
-            const agreementResponse = await this.session.fetch(authZServerURL, {
+            const agreementResponse = await this.session.fetch(AuthZInterfaceURL, {
                 method: "POST",
                 headers: {
                     "content-type": "application/json"
