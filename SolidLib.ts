@@ -54,6 +54,26 @@ export class SolidLib {
         throw Error("not implemented yet")
     }
 
+    public async addPolicy(policy: string): Promise<boolean> {
+        // stubbed: Don't have access
+        console.log(`SolidLib]:addPolicy - No access, need AuthZ token.`)
+        const authZRequestMessage: SolidAuthZRequestMessage = {
+            authNToken: {
+                WebID: this.session?.info.webId ?? "",
+                Client: this.session?.info.clientAppId ?? "",
+                Issuer: "" // TODO:
+            },
+            action: Action.Write,
+            query: "policy",
+            purpose: [],
+            agreement: undefined
+        }
+        const authZToken = await this.getAuthZToken(authZRequestMessage)
+
+        console.log(`SolidLib]:addPolicy - Now that token is there, add Policy`, authZToken)
+        throw Error("not implemented yet")
+
+    }
     private async getAuthZToken(authZRequestMessage: SolidAuthZRequestMessage): Promise<AuthZToken> {
         const authZServerURL = "http://localhost:8050/" // Note: hardcoded
 
