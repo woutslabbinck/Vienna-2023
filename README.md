@@ -37,7 +37,7 @@ Start the Admin Interface (server)
 npx ts-node src/Admin/AdminServer.ts 
 ```
 
-SolidLib shop adds policy flow
+SolidLib shop adds policy flow (needs both admin and auth interfaces running)
 ```sh
 npx ts-node adminFlow.ts
 ```
