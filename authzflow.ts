@@ -74,7 +74,10 @@ class SolidLib {
             })
         })
 
-        let token = {}
+        let token: AuthZToken = {
+            access_token: "",
+            type: ""
+        }
 
         if (res.status === 401) {
             const preObligationRequest = await res.json()
@@ -82,6 +85,7 @@ class SolidLib {
             console.log(`[SolidLib]:getAuthZToken - Signing "pod signed Instantiated Policy".`)
 
             // Note: maybe this can be recursive?
+            // signing here and storing in agreement
             const agreement = {
                 owner: preObligationRequest.value.actor,
                 ownerSignature: preObligationRequest.value.actorSignature,
@@ -108,13 +112,13 @@ class SolidLib {
 
             if (agreementResponse.status === 200) {
                 console.log(`[SolidLib]:getAuthZToken - Retrieved an AuthZ token to ${agreement.policy["access-mode"]} ${agreement.policy.resource}.`)
-                token = agreementResponse.json()
+                token = agreementResponse.json() as any
             } else {
                 console.log('[SolidLib]:getAuthZToken - Failed to retrieve an AuthZ token.')
             }
         } else {
             console.log(`[SolidLib]:getAuthZToken - Retrieved an AuthZ token (no agreements).`)
-            token = res.json()
+            token = res.json() as any
         }
         return token
     }

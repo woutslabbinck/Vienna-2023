@@ -1,4 +1,5 @@
 import express from 'express'
+import { AuthZInterfaceResponse } from '../ISolidLib'
 const app = express()
 const port = 8050
 
@@ -6,7 +7,7 @@ app.use(express.json())
 
 app.post('/', async (req, res) => {
   // validate AuthN token
-  // note: stubbed
+  // note: verification token is stubbed
   if (!req.headers.authorization) {
     res
       .status(401)
@@ -34,52 +35,30 @@ app.post('/', async (req, res) => {
   }
   const authZRequestMessage = req.body
 
-  if (authZRequestMessage.agreement === null) {
-    console.log(`[${new Date().toISOString()}] - Authz: "${client_id}" Requesting ${authZRequestMessage['access-mode']} for ${authZRequestMessage.resource} with purpose`,authZRequestMessage.purpose)
+  // checking what the target is for the resource | data or policies
+  const requestType = checkRequest(authZRequestMessage.resource)
 
-    // Policy matching here | stubbed
-    const authZResponseMessage = {
-      type: "signObligation",
-      value: {
-        actor: actor,
-        actorSignature: {
-          issuer: "Pod",
-          value: "hash"
-        },
-        "policy": {
-          "access-mode": "read",
-          "resource": "date_of_birth",
-          "purpose": "verification",
-          "actor": client_id
-        }
-      }
-    }
+  const authZInterfaceResponse = policyNegotiation(authZRequestMessage, client_id, actor)
 
-    console.log(`[${new Date().toISOString()}] - Authz: "${client_id}" needs to sign this "pod signed Instantiated Policy".`)
+  let statusCode = 0
+  let body: any = {}
+  if (authZInterfaceResponse.result) {
+    statusCode = 200
+    body = authZInterfaceResponse.authZToken
+    console.log(`[${new Date().toISOString()}] - Authz: Returning AuthZ token.`)
 
-    res
-      .status(401)
-      .contentType("application/json")
-      .send(authZResponseMessage)
-    return
+  }
+  else {
+    statusCode = 401
+    body = authZInterfaceResponse.preObligation
+    console.log(body);
   }
 
-  // verify agreement
-  console.log(`[${new Date().toISOString()}] - Authz: "${client_id}" Requesting ${authZRequestMessage['access-mode']} for ${authZRequestMessage.resource} with agreement.`)
-  console.log(`[${new Date().toISOString()}] - Authz: Verifying agreement.`)
-  console.log(`[${new Date().toISOString()}] - Authz: Agreement verified: Storing it to [Log Store].`)
 
-
-  console.log(`[${new Date().toISOString()}] - Authz: Returning AuthZ token.`)
-  // sent authZtoken
- 
-  res
-    .status(200)
+  res.status(statusCode)
     .contentType("application/json")
-    .send({
-      access_token: "verySecretToken.Allowed-to-read-dob.",
-      type: 'Bearer' // maybe Dpop, I don't fucking know
-    })
+    .send(body)
+  return
 })
 
 app.listen(port, () => {
@@ -90,3 +69,65 @@ app.listen(port, () => {
 function parseJwt(token: string) {
   return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
 }
+
+function checkRequest(query: string): ResourceType {
+  if (query === "policy") {
+    return ResourceType.POLICY
+  }
+
+  return ResourceType.DATA
+}
+
+enum ResourceType {
+  POLICY = "policy",
+  DATA = "data"
+}
+
+function policyNegotiation(authZRequestMessage: any, client_id: string, actor: string): AuthZInterfaceResponse {
+  let authZInterfaceResponse: AuthZInterfaceResponse = {
+    result: false
+  }
+  if (authZRequestMessage.agreement === null) {
+    // TODO: validate agreement (right now just check validity of signatures)
+    // Needs to be done properly 
+    console.log(`[${new Date().toISOString()}] - Authz: "${client_id}" Requesting ${authZRequestMessage['access-mode']} for ${authZRequestMessage.resource} with purpose`, authZRequestMessage.purpose)
+
+    // Policy matching here | stubbed
+    // if we have policies, authzresponse should be created based on that and the request
+    authZInterfaceResponse = {
+      result: false,
+      preObligation: {
+        type: "signObligation",
+        value: {
+          actor: actor,
+          actorSignature: {
+            issuer: "Pod",
+            value: "hash"
+          },
+          "policy": {
+            "access-mode": "read",
+            "resource": "date_of_birth",
+            "purpose": "verification",
+            "actor": client_id
+          }
+        }
+      }
+    }
+    console.log(`[${new Date().toISOString()}] - Authz: "${client_id}" needs to sign this "pod signed Instantiated Policy".`)
+  } else {
+    // verify agreement
+    console.log(`[${new Date().toISOString()}] - Authz: "${client_id}" Requesting ${authZRequestMessage['access-mode']} for ${authZRequestMessage.resource} with agreement.`)
+    console.log(`[${new Date().toISOString()}] - Authz: Verifying agreement.`)
+    console.log(`[${new Date().toISOString()}] - Authz: Agreement verified: Storing it to [Log Store].`)
+    authZInterfaceResponse = {
+      result: true,
+      authZToken: {
+        access_token: "verySecretToken.Allowed-to-read-dob.",
+        type: 'Bearer' // maybe Dpop, I don't fucking know
+      }
+    }
+  }
+  return authZInterfaceResponse
+
+}
+
