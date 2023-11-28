@@ -13,7 +13,7 @@ export class SolidLib {
         require('dotenv').config()
 
         console.log("[SolidLib]:login - Logging in.")
-        // note: hardcoded
+        // TODO: client hardcoded through passing constructor, should be the login screen in a proper demo
         const webId: string = process.env.WEB_ID!
         const username: string = process.env.USER_NAME!
         const password: string = process.env.PASSWORD!
