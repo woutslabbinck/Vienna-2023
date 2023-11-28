@@ -45,7 +45,7 @@ export type Signature = {
 export type InstantiatedPolicy = {
     actor: string,
     resource: string,
-    purpose : string,
+    purpose: string,
     "access-mode": string
 };
 
@@ -63,8 +63,8 @@ export type PreObligationRequest = {
 export type Purpose = string;
 
 export enum Action {
-    Read,
-    Write
+    Read = "read",
+    Write = "write"
 }
 
 export enum ErrorMessage {

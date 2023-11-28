@@ -64,9 +64,7 @@ export class SolidLib {
                 Issuer: "" // TODO:
             },
             action: Action.Write,
-            query: "policy",
-            purpose: [],
-            agreement: undefined
+            query: "policy"
         }
         const authZToken = await this.getAuthZToken(authZRequestMessage)
 
@@ -88,7 +86,7 @@ export class SolidLib {
                 "content-type": "application/json"
             },
             body: JSON.stringify({
-                "access-mode": "read",
+                "access-mode": authZRequestMessage.action,
                 "resource": authZRequestMessage.query,
                 "purpose": authZRequestMessage.purpose,
                 "agreement": authZRequestMessage.agreement ?? null
@@ -124,8 +122,8 @@ export class SolidLib {
                     "content-type": "application/json"
                 },
                 body: JSON.stringify({
-                    "access-mode": "read",
-                    "resource": "date_of_birth",
+                    "access-mode": Action.Read,
+                    "resource": authZRequestMessage.query,
                     "purpose": [],
                     "agreement": agreement
                 })
