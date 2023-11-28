@@ -6,7 +6,6 @@ import {storeToString, turtleStringToStore} from "./Util";
 import { DataFactory } from "n3";
 const namedNode = DataFactory.namedNode
 
-const client_id = "food-store" // Note: hardcoded food store
 /**
  * Creates an authenticated fetch using the mail, password and the IDP URL of the given pod.
  *
@@ -18,10 +17,11 @@ async function authenticatedFetch(config: {
     email: string,
     password: string,
     idp: string,
-    tokenEndpoint?: string
+    tokenEndpoint?: string,
+    client: string
 }): Promise<(input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>> {
     // fetch id and secret from the client credentials.
-    const {email, password, idp} = config
+    const {email, password, idp, client: appName} = config
     const tokenUrl = config.tokenEndpoint ?? new URL(idp).origin + "/.oidc/token" // note: can retrieve it from {server}/.well-known/openid-configuration (e.g. http://localhost:3000/.well-known/openid-configuration)
     const idpResponse = await fetch(idp)
 
@@ -33,7 +33,7 @@ async function authenticatedFetch(config: {
     const credentialsResponse = await fetch(credentialURL, {
         method: 'POST',
         headers: {'content-type': 'application/json'},
-        body: JSON.stringify({email: email, password: password, name: client_id}), 
+        body: JSON.stringify({email: email, password: password, name: appName}), 
     });
 
     // only if 200
@@ -88,17 +88,18 @@ async function getIdp(webID: string): Promise<string> {
 export async function getAuthenticatedSession(config: {
     webId: string,
     email: string,
-    password: string
+    password: string,
+    client: string
 }): Promise<Session> {
-    const {email, password} = config
+    const {email, password, client} = config
     const idp = await getIdp(config.webId);     // TODO: use getIdentityProvider from https://github.com/SolidLabResearch/SolidLabLib.js
     const session = new Session()
     try {
         // @ts-ignore
-        session.fetch = await authenticatedFetch({email, password, idp});
+        session.fetch = await authenticatedFetch({email, password, idp, client});
         session.info.isLoggedIn = true
         session.info.webId = config.webId
-        session.info.clientAppId = client_id
+        session.info.clientAppId = client
     } catch (e: unknown) {
         const error = e as Error
         console.log("Log in not successful for webID: " + config.webId)

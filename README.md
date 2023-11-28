@@ -34,5 +34,5 @@ npx ts-node src/AuthZ/AuthZServer.ts
 SolidLib shop gets data flow
 
 ```sh
-npx ts-node authzflow.ts 
+npx ts-node app.ts 
 ```

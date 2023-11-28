@@ -7,6 +7,8 @@ app.use(express.json())
 
 app.post('/', async (req, res) => {
   // validate AuthN token
+  console.log(`[${new Date().toISOString()}] - Authz: Verifying authN token.`);
+
   // note: verification token is stubbed
   if (!req.headers.authorization) {
     res
@@ -20,7 +22,7 @@ app.post('/', async (req, res) => {
   const authNToken = authNHeader.split(" ")[1]
   const clientSession = parseJwt(authNToken)
 
-  console.log(`[${new Date().toISOString()}] - Authz: AuthN token: OK`);
+  console.log(`[${new Date().toISOString()}] - Authz: AuthN token: OK.`);
 
   const client_id = clientSession.client_id.split("_")[0] // don't want random uuid
   const actor = clientSession.webid
@@ -38,20 +40,39 @@ app.post('/', async (req, res) => {
   // checking what the target is for the resource | data or policies
   const requestType = checkRequest(authZRequestMessage.resource)
 
-  const authZInterfaceResponse = policyNegotiation(authZRequestMessage, client_id, actor)
-
+  let authZInterfaceResponse: AuthZInterfaceResponse = {
+    result: false
+  }
+  switch (requestType) {
+    case ResourceType.POLICY:
+      // give token related to owner is allowed to interact with admin
+      console.log(`[${new Date().toISOString()}] - Authz: ${actor} (client: ${client_id}) requesting to add policy.`)
+      
+      authZInterfaceResponse = {
+        result: true,
+        authZToken: {
+          access_token: "verySecretToken.Allowed-to-add-policy",
+          type: 'Bearer' // maybe Dpop, I don't fucking know
+        }
+      }
+      break;
+    case ResourceType.DATA:
+      authZInterfaceResponse = policyNegotiation(authZRequestMessage, client_id, actor)
+      break;
+    default:
+      break;
+  }
   let statusCode = 0
   let body: any = {}
+
   if (authZInterfaceResponse.result) {
     statusCode = 200
     body = authZInterfaceResponse.authZToken
     console.log(`[${new Date().toISOString()}] - Authz: Returning AuthZ token.`)
-
   }
   else {
     statusCode = 401
     body = authZInterfaceResponse.preObligation
-    console.log(body);
   }
 
 
