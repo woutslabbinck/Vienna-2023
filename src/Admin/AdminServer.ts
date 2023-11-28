@@ -5,6 +5,7 @@ const app = express()
 const port = 8060
 app.use(bodyParser.text({ type: 'text/turtle' }));
 
+const policyStore = new PolicyStore()
 
 app.post('/', async (req, res) => {
     // check for AuthZ token
@@ -29,8 +30,6 @@ app.post('/', async (req, res) => {
 
     console.log(`[${new Date().toISOString()}] - Admin: Incorrect AuthZ token.`);
 
-
-    const policyStore = new PolicyStore()
     policyStore.write(req.body, new Date().valueOf() + '.ttl')
     console.log(`[${new Date().toISOString()}] - Admin: Writing Policy to Policy Store.`);
 
