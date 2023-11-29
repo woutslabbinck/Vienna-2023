@@ -14,8 +14,6 @@ describe('an Admin Interface request', () => {
     const verySecretToken = "Bearer verySecretToken.Allowed-to-add-policy"
 
     beforeAll(async () => {
-        // TODO: run admin server; currently assumes admin server is running at port 8060
-
         require('dotenv').config()
         adminInterface = new AdminInterface()
         adminInterface.start(port)
@@ -68,5 +66,7 @@ describe('an Admin Interface request', () => {
         })
         expect(response.status).toBe(200);
         expect(await response.json()).toEqual({ info: "Policy added" })
+                // TODO: check whether policy is created by using the store thing
+
     })
 })
