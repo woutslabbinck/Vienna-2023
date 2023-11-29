@@ -1,5 +1,7 @@
 import express from 'express'
 import { AuthZInterfaceResponse } from '../ISolidLib'
+import { Server } from 'http';
+
 const app = express()
 const port = 8050
 
@@ -47,7 +49,7 @@ app.post('/', async (req, res) => {
     case ResourceType.POLICY:
       // give token related to owner is allowed to interact with admin
       console.log(`[${new Date().toISOString()}] - Authz: ${actor} (client: ${client_id}) requesting to add policy.`)
-      
+
       authZInterfaceResponse = {
         result: true,
         authZToken: {
@@ -82,10 +84,7 @@ app.post('/', async (req, res) => {
   return
 })
 
-app.listen(port, () => {
-  console.log(`Authorization Interface listening on ${port}`)
-  console.log(`URI: http://localhost:${port}/`)
-})
+
 
 function parseJwt(token: string) {
   return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
@@ -109,8 +108,7 @@ function policyNegotiation(authZRequestMessage: any, client_id: string, actor: s
     result: false
   }
   if (authZRequestMessage.agreement === null) {
-    // TODO: validate agreement (right now just check validity of signatures)
-    // Needs to be done properly 
+    // TODO: get and match policy
     console.log(`[${new Date().toISOString()}] - Authz: "${client_id}" Requesting ${authZRequestMessage['access-mode']} for ${authZRequestMessage.resource} with purpose`, authZRequestMessage.purpose)
 
     // Policy matching here | stubbed
@@ -136,7 +134,8 @@ function policyNegotiation(authZRequestMessage: any, client_id: string, actor: s
     }
     console.log(`[${new Date().toISOString()}] - Authz: "${client_id}" needs to sign this "pod signed Instantiated Policy".`)
   } else {
-    // verify agreement
+    // TODO: validate agreement (right now just check validity of signatures)
+    // Needs to be done properly 
     console.log(`[${new Date().toISOString()}] - Authz: "${client_id}" Requesting ${authZRequestMessage['access-mode']} for ${authZRequestMessage.resource} with agreement.`)
     console.log(`[${new Date().toISOString()}] - Authz: Verifying agreement.`)
     console.log(`[${new Date().toISOString()}] - Authz: Agreement verified: Storing it to [Log Store].`)
@@ -152,3 +151,16 @@ function policyNegotiation(authZRequestMessage: any, client_id: string, actor: s
 
 }
 
+
+export class AuthZInterface {
+  private server: Server | undefined;
+  public start(port: number): void {
+    app.listen(port, () => {
+      console.log(`Authorization Interface listening on ${port}`)
+      console.log(`URI: http://localhost:${port}/`)
+    })
+  }
+  public stop(): void {
+    this.server?.close();
+  }
+}
