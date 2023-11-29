@@ -1,5 +1,7 @@
 import express from 'express'
 import { AuthZInterfaceResponse } from '../ISolidLib'
+import { Server } from 'http';
+
 const app = express()
 const port = 8050
 
@@ -82,10 +84,7 @@ app.post('/', async (req, res) => {
   return
 })
 
-app.listen(port, () => {
-  console.log(`Authorization Interface listening on ${port}`)
-  console.log(`URI: http://localhost:${port}/`)
-})
+
 
 function parseJwt(token: string) {
   return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
@@ -152,3 +151,16 @@ function policyNegotiation(authZRequestMessage: any, client_id: string, actor: s
 
 }
 
+
+export class AuthZInterface {
+  private server: Server | undefined;
+  public start(port: number): void {
+    app.listen(port, () => {
+      console.log(`Authorization Interface listening on ${port}`)
+      console.log(`URI: http://localhost:${port}/`)
+    })
+  }
+  public stop(): void {
+    this.server?.close();
+  }
+}

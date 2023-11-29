@@ -26,15 +26,10 @@ USER_NAME=""
 PASSWORD=""
 ```
 
-Start the AuthZ Interface (server)
+Start the Interfaces (AuthZ Interface (server), Admin Interface (server))
 
 ```sh
-npx ts-node src/AuthZ/AuthZServer.ts
-```
-
-Start the Admin Interface (server)
-```sh
-npx ts-node src/Admin/AdminServer.ts 
+npx ts-node runInterfaces.ts
 ```
 
 SolidLib shop adds policy flow (needs both admin and auth interfaces running)

@@ -1,7 +1,7 @@
 import express from 'express'
 import bodyParser from 'body-parser';
 import { PolicyStore } from '../util/Storage';
-import { Server, IncomingMessage, ServerResponse } from 'http';
+import { Server} from 'http';
 const app = express()
 const port = 8060
 app.use(bodyParser.text({ type: 'text/turtle' }));
