@@ -1,6 +1,7 @@
 import express from 'express'
 import bodyParser from 'body-parser';
 import { PolicyStore } from '../util/Storage';
+import { Server, IncomingMessage, ServerResponse } from 'http';
 const app = express()
 const port = 8060
 app.use(bodyParser.text({ type: 'text/turtle' }));
@@ -28,7 +29,15 @@ app.post('/', async (req, res) => {
         return
     }
 
-    console.log(`[${new Date().toISOString()}] - Admin: Incorrect AuthZ token.`);
+    if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
+        res.status(400)
+        .contentType("application/json")
+        .send({ error: "No body" })
+        return
+    }
+
+
+    console.log(`[${new Date().toISOString()}] - Admin: Correct AuthZ token.`);
 
     policyStore.write(req.body, new Date().valueOf() + '.ttl')
     console.log(`[${new Date().toISOString()}] - Admin: Writing Policy to Policy Store.`);
@@ -39,7 +48,16 @@ app.post('/', async (req, res) => {
         .send({ info: "Policy added" })
 })
 
-app.listen(port, () => {
-    console.log(`Admin Interface listening on ${port}`)
-    console.log(`URI: http://localhost:${port}/`)
-})
+
+export class AdminInterface{
+    private server: Server | undefined;
+    public start(port: number): void{
+        this.server = app.listen(port, () => {
+            console.log(`Admin Interface listening on ${port}`)
+            console.log(`URI: http://localhost:${port}/`)
+        })
+    }
+    public stop():void {
+        this.server?.close();
+    }
+}
